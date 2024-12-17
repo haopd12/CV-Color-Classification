@@ -5,7 +5,7 @@
 
 ##  How to use this dataset
 
-- Access link [PETA_dataset](https://drive.google.com/file/d/1daegthf1hFrlW9cl9rZmmEUmDPhLgx9A/view?usp=sharing) and extract to folder /data/
+- Access link [PETA_dataset](https://drive.google.com/file/d/1G5bp_TUvrg3TnnatuYcrrS8rNoAu0lk8/view?usp=sharing) and extract to folder /data/
 - The annotation of images in each context is saved in /data/PETA_dataset/{context}/Label_process.json
 - When you try to use them, you must change directory of image in all annotation_paths first.
 - The best way to split dataset into 3 parts: train, val, test is using TownCentre context for validating, VIPeR for testing and others for training.
