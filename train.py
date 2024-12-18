@@ -19,13 +19,14 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 import torchvision.models as models
 from dataloaders.base_dataset import ColorAttribute
+from models.resnet import Bottleneck, ResNetCustom
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 print(model_names)
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-parser.add_argument('-a', '--arch', metavar='ARCH', default='mobilenet_v2',
+parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet50',
                     choices=model_names,
                     help='model architecture: ' +
                         ' | '.join(model_names) +
@@ -54,7 +55,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
-parser.add_argument('--pretrained', dest='pretrained', action='store_true',
+parser.add_argument('--pretrained', dest='pretrained', action='store_false',
                     help='use pre-trained model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
@@ -148,6 +149,12 @@ def main_worker(gpu, ngpus_per_node, args):
             raise ValueError('unsupported pretrained model architecture')
     else:
         print("=> creating model '{}'".format(args.arch))
+        if args.arch == 'resnet50':
+            model = ResNetCustom(Bottleneck, [3, 4, 6, 3])
+            state_dict = torch.load('/mnt/color-classification/pretrained/resnet50-0676ba61.pth', map_location='cpu')
+            for key in state_dict:
+                print(key)
+            model.load_state_dict(state_dict=state_dict, strict=False)
         model = models.__dict__[args.arch](num_classes=11)
 
     # checkpoint = torch.load('/home/face_attribute/baseline/model_glass_best.pth', map_location='cuda')
