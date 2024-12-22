@@ -20,13 +20,14 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 from dataloaders.base_dataset import ColorAttribute
 from models.resnet import Bottleneck, ResNetCustom
+from models.alexnet import AlexNetCustom
 
 model_names = sorted(name for name in models.__dict__
     if name.islower() and not name.startswith("__")
     and callable(models.__dict__[name]))
 print(model_names)
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet50',
+parser.add_argument('-a', '--arch', metavar='ARCH', default='alexnet',
                     choices=model_names,
                     help='model architecture: ' +
                         ' | '.join(model_names) +
@@ -55,7 +56,7 @@ parser.add_argument('--resume', default='', type=str, metavar='PATH',
                     help='path to latest checkpoint (default: none)')
 parser.add_argument('-e', '--evaluate', dest='evaluate', action='store_true',
                     help='evaluate model on validation set')
-parser.add_argument('--pretrained', dest='pretrained', action='store_false',
+parser.add_argument('--pretrained', dest='pretrained', action='store_false', default=False, 
                     help='use pre-trained model')
 parser.add_argument('--world-size', default=-1, type=int,
                     help='number of nodes for distributed training')
@@ -144,6 +145,10 @@ def main_worker(gpu, ngpus_per_node, args):
             new_linear = nn.Linear(model.classifier[1].in_features, 11)
             new_classifier = nn.Sequential(nn.Dropout(0.2), new_linear)
             model.classifier = new_classifier
+        elif 'alexnet' in args.arch:
+            assert model.classifier is not None
+            # Thay thế lớp phân loại cuối cùng với một lớp mới có 11 đầu ra
+            model.classifier[6] = nn.Linear(model.classifier[6].in_features, 11)
         # TODO: support other model architecture variants
         else:
             raise ValueError('unsupported pretrained model architecture')
@@ -155,7 +160,14 @@ def main_worker(gpu, ngpus_per_node, args):
             for key in state_dict:
                 print(key)
             model.load_state_dict(state_dict=state_dict, strict=False)
-        model = models.__dict__[args.arch](num_classes=11)
+            model = models.__dict__[args.arch](num_classes=11)
+        if args.arch == 'alexnet':
+            model = AlexNetCustom(num_classes=11, dropout=0.5)
+            state_dict = torch.load('/kaggle/input/resnet/pytorch/default/1/resnet50-0676ba61.pth', map_location='cpu')
+            for key in state_dict:
+                print(key)
+            model.load_state_dict(state_dict=state_dict, strict=False)
+            model = models.__dict__[args.arch](num_classes=11)
 
     # checkpoint = torch.load('/home/face_attribute/baseline/model_glass_best.pth', map_location='cuda')
     # new_dict = collections.OrderedDict()
