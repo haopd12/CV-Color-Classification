@@ -34,12 +34,13 @@ class ColorAttribute(VisionDataset):
         self._images_folder = self._base_folder + '/'
         self._annotation = annotation
         # self._is_train = 'True' if 'train' in split else 'False'
-        # if self._split == 'train':
-        #     self._contexts = self._contexts[:-2]
-        # elif self._split == 'val':
-        #     self._contexts = [self._contexts[-2]]
-        # elif self._split == 'test':
-        #     self._contexts = [self._contexts[-1]]
+        # Xử lý các context cho từng split
+        if self._split == 'train':
+            self._contexts = self._contexts[:-2]  # Tất cả các context trừ 2 context cuối
+        elif self._split == 'val':
+            self._contexts = [self._contexts[-2]]  # Context thứ hai cuối
+        elif self._split == 'test':
+            self._contexts = [self._contexts[-1]]  # Context cuối cùng
         self._labels, self._image_files = self.get_dataset()
         print(Counter(self._labels))
 
