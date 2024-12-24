@@ -64,7 +64,11 @@ class AlexNetCustom(nn.Module):
 
 if __name__ == '__main__':
     model = AlexNetCustom(num_classes=11, dropout=0.5)
-    state_dict = torch.load('/kaggle/input/resnet/pytorch/default/1/resnet50-0676ba61.pth', map_location='cpu')
+    state_dict = torch.load('/kaggle/input/m/dungvh204823/alexnet/pytorch/default/1/alexnet-owt-7be5be79.pth', map_location='cpu')
     for key in state_dict:
         print(key)
     model.load_state_dict(state_dict=state_dict, strict=False)
+    model.classifier = nn.Sequential(
+        model.classifier,
+        nn.Linear(1000, 11)  # Lớp cuối cùng mới cho 11 lớp
+    )
