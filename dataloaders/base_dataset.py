@@ -35,13 +35,15 @@ class ColorAttribute(VisionDataset):
         self._annotation = annotation
         # self._is_train = 'True' if 'train' in split else 'False'
         # Xử lý các context cho từng split
-        if self._split == 'train':
-            self._contexts = self._contexts[:-2]  # Tất cả các context trừ 2 context cuối
-        elif self._split == 'val':
-            self._contexts = [self._contexts[-2]]  # Context thứ hai cuối
-        elif self._split == 'test':
-            self._contexts = [self._contexts[-1]]  # Context cuối cùng
+        # if self._split == 'train':
+        #     self._contexts = self._contexts[:-2]  # Tất cả các context trừ 2 context cuối
+        # elif self._split == 'val':
+        #     self._contexts = [self._contexts[-2]]  # Context thứ hai cuối
+        # elif self._split == 'test':
+        #     self._contexts = [self._contexts[-1]]  # Context cuối cùng
         self._labels, self._image_files = self.get_dataset()
+        print(len(self._labels))
+        print(len(self._image_files))
         print(Counter(self._labels))
 
     def get_dataset(self):
@@ -77,7 +79,7 @@ class ColorAttribute(VisionDataset):
 if __name__ == "__main__":
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
-    dataset = ColorAttribute('/mnt/data/PETA_dataset', '/home/data/annotation.txt',
+    dataset = ColorAttribute('/home/CV-Color-Classification/data/PETA_dataset', '/home/data/annotation.txt',
                         'test', transforms.Compose([
             transforms.ToTensor(),
             transforms.RandomResizedCrop(224),
